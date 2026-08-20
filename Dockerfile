@@ -10,4 +10,4 @@ RUN python -m pip install --upgrade pip && \
 COPY handler.py /handler.py
 
 # -u keeps stdout unbuffered so RunPod worker logs show your prints live.
-CMD ["python", "-u", "handler.py"]
+CMD ["python", "-u", "/handler.py"]
