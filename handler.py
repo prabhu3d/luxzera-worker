@@ -13,24 +13,20 @@ def handler(job):
     try:
         job_input = job.get("input", {})
         
-        # லவபில் அனுப்பும் அனைத்து சாத்தியமான கீ பெயர்களையும் வரிசையாகச் சோதித்தல்
+        # லவபில் ஆப் அனுப்பும் சரியான கீ பெயர்களைப் பயன்படுத்துதல்
         photo_data_uri = (
-            job_input.get("photo/image") or 
+            job_input.get("photo_url") or 
+            (job_input.get("photo_urls")[0] if isinstance(job_input.get("photo_urls"), list) and len(job_input.get("photo_urls")) > 0 else None) or
             job_input.get("photo") or 
-            job_input.get("image") or 
-            job_input.get("photo_base64") or
-            (job_input.get("photos")[0] if isinstance(job_input.get("photos"), list) and len(job_input.get("photos")) > 0 else None)
+            job_input.get("image")
         )
         
         song_data_uri = (
-            job_input.get("song/audio") or 
+            job_input.get("ref_song") or 
             job_input.get("song") or 
-            job_input.get("audio") or 
-            job_input.get("song_base64") or
-            (job_input.get("songs")[0] if isinstance(job_input.get("songs"), list) and len(job_input.get("songs")) > 0 else None)
+            job_input.get("audio")
         )
         
-        # ஒருவேளை டேட்டா கிடைக்கவில்லை என்றால், முழு input डேட்டாவையும் ప్రిண்ட் செய்து காட்டும்
         if not photo_data_uri or not song_data_uri:
             return {"error": f"Data missing! Keys received from Lovable: {list(job_input.keys())}"}
             
@@ -64,5 +60,4 @@ def handler(job):
     except Exception as e:
         return {"error": f"Exception: {str(e)}"}
 
-runpod.serverless.start({"handler": handler}) 
-        
+runpod.serverless.start({"handler": handler})
