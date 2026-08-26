@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     ffmpeg \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,3 +18,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY handler.py /app/handler.py
 
 CMD ["python3", "-u", "/app/handler.py"]
+
