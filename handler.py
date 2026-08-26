@@ -3,6 +3,7 @@ import base64
 import runpod
 import re
 import tempfile
+import subprocess
 
 def super_clean_base64(data_string):
     if not data_string or not isinstance(data_string, str):
@@ -22,28 +23,28 @@ def handler(event):
         photos = job_input.get("photos", []) 
         ref_video_url = job_input.get("refVideoUrl", "")
         
-        print(f"Processing request for device: {device_id} with {len(photos)} photos.")
+        print(f"Luxzera Production Run -> Device: {device_id}")
 
-        # பயனரின் போட்டோக்களைச் சுத்தப்படுத்துவது
-        cleaned_photos = [super_clean_base64(p) for p in photos]
+        clean_photo_data = super_clean_base64(photos[0] if photos else "")
+        if not clean_photo_data:
+            raise Exception("Invalid or empty photo data received.")
 
-        # தற்காலிக அவுட்புட் கோப்பு உருவாக்கம்
+        photo_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+        photo_file.write(base64.b64decode(clean_photo_data))
+        photo_file.close()
+
         output_file = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False)
         output_file.close()
-
-        # [முக்கியம்]: இங்குதான் உங்களது மாடல் வீடியோவை ரெண்டர் செய்து 
-        # அந்த பைலை output_file.name-ல் சேமிக்க வேண்டும். 
-        # உங்களுடைய மெயின் AI ஸ்கிரிப்ட் ஃபங்ஷனை இங்கே இணைத்துக்கொள்ளலாம்.
 
         if os.path.exists(output_file.name) and os.path.getsize(output_file.name) > 0:
             with open(output_file.name, "rb") as f:
                 encoded_video = base64.b64encode(f.read()).decode("utf-8")
             video_output = f"data:video/mp4;base64,{encoded_video}"
         else:
-            # ஒருவேளை மாடல் ஃபைல் வரவில்லை என்றால் லவபில் தடைபடாமல் இருக்க 
-            # உடனடியாக ஒரிஜினல் அவுட்புட் ஃபார்மட்டைத் திருப்புவது
-            video_output = ""
+            raise Exception("AI Model failed to generate output video file.")
 
+        if os.path.exists(photo_file.name):
+            os.remove(photo_file.name)
         if os.path.exists(output_file.name):
             os.remove(output_file.name)
 
@@ -53,7 +54,7 @@ def handler(event):
         }
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"Handler Execution Error: {str(e)}")
         return {
             "output_url": "",
             "error": str(e),
