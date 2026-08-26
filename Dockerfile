@@ -1,6 +1,8 @@
 FROM python:3.10-slim
 
-RUN apt-get update && apt-get install -y \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
     ffmpeg \
