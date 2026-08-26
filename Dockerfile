@@ -1,11 +1,17 @@
-FROM runpod/base:0.6.3-cuda11.8.0
+FROM python:3.10-slim
 
-WORKDIR /
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    ffmpeg \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /requirements.txt
-RUN python3 -m pip install --upgrade pip && python3 -m pip install --no-cache-dir -r /requirements.txt
+WORKDIR /app
 
-COPY handler.py /handler.py
+RUN pip install --no-cache-dir runpod opencv-python numpy pillow
 
-# -u keeps stdout unbuffered so RunPod worker logs show your print statements
-CMD ["python3", "-u", "/handler.py"]
+COPY handler.py /app/handler.py
+
+CMD ["python3", "-u", "/app/handler.py"]
