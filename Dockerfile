@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir runpod opencv-python numpy pillow
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY handler.py /app/handler.py
 
 CMD ["python3", "-u", "/app/handler.py"]
+
