@@ -16,4 +16,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY handler.py /app/handler.py
 
 CMD ["python3", "-u", "/app/handler.py"]
-
